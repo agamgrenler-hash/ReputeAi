@@ -390,13 +390,12 @@ export default function App() {
     setTimeout(() => setNotif(null), 3500);
   };
 
-  useEffect(() => {
+ useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Restore session
   useEffect(() => {
     const stored = localStorage.getItem("repute_user");
     if (stored) {
@@ -412,7 +411,6 @@ export default function App() {
     }
   }, []);
 
-  // Paddle
   useEffect(() => {
     initializePaddle({
       environment: "sandbox",
@@ -427,39 +425,29 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    const accessToken = sessionStorage.getItem("pending_token");
+    if (!accessToken) return;
+    sessionStorage.removeItem("pending_token");
 
-  // Restore session
-  useEffect(() => {
-    const stored = localStorage.getItem("repute_user");
-    if (stored) {
-      try {
-        const u = JSON.parse(stored);
-        setGoogleUser(u);
+    fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+      .then((r) => r.json())
+      .then((info) => {
+        const user: GoogleUser = {
+          name: info.name,
+          email: info.email,
+          picture: info.picture,
+          accessToken,
+        };
+        setGoogleUser(user);
+        localStorage.setItem("repute_user", JSON.stringify(user));
+        localStorage.setItem("google_access_token", accessToken);
         setIsDemoMode(false);
-        const loc = sessionStorage.getItem("gbp_location");
-        if (loc) setLocationId(loc);
-      } catch {
-        /* ignore */
-      }
-    }
-  }, []);
-
-  // Paddle
-  useEffect(() => {
-    initializePaddle({
-      environment: "sandbox",
-      token: PADDLE_TOKEN,
-      eventCallback: (data) => {
-        if (data.name === "checkout.completed")
-          showNotif("התשלום בוצע בהצלחה! 🎉", "#22d3a0", "🎉");
-      },
-    }).then((p) => {
-      if (p) setPaddle(p);
-    });
+        setPage("onboarding");
+        fetchBusinessAccounts(accessToken);
+      })
+      .catch(() => showNotif("שגיאה בהתחברות לגוגל", "#f87171", "✕"));
   }, []);
 
   const handleGoogleLogin = () => {
