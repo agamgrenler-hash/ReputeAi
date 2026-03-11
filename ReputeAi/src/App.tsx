@@ -16,12 +16,10 @@ import {
 } from "recharts";
 
 // ─── Config ────────────────────────────────────────────────────────────────────
-const GOOGLE_CLIENT_ID =
-  process.env.REACT_APP_GOOGLE_CLIENT_ID ||
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID ||
   "569970007824-vtll6ndvbkeiilpt7c4700bqmehufn1g.apps.googleusercontent.com";
-const ANTHROPIC_KEY = process.env.REACT_APP_ANTHROPIC_KEY || "";
-const PADDLE_TOKEN =
-  process.env.REACT_APP_PADDLE_TOKEN || "test_5e1e7dd49d00da5dae32f3e82a5";
+const ANTHROPIC_KEY = import.meta.env.VITE_ANTHROPIC_KEY || "";
+const PADDLE_TOKEN = import.meta.env.VITE_PADDLE_TOKEN || "test_5e1e7dd49d00da5dae32f3e82a5";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 interface Review {
