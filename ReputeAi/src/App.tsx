@@ -2644,7 +2644,7 @@ export default function App() {
                   background: `linear-gradient(135deg, ${plan.color}, ${plan.color})`,
                   boxShadow: `0 8px 24px ${plan.color}30`,
                 }}
-                onClick={() => openCheckout(plan.priceId)}
+               onClick={() => paddle?.Checkout.open({ items: [{ priceId: plan.priceId, quantity: 1 }] })}
               >
                 בחר תוכנית ←
               </button>
