@@ -253,25 +253,9 @@ export default function App() {
       .catch(() => showNotif("שגיאה בהתחברות לגוגל", "#f87171", "✕"));
   }, []);
 
+  // Implicit flow — no refresh tokens, just return the stored access token
   const getValidToken = async (): Promise<string | null> => {
-    const expiry = Number(localStorage.getItem("google_token_expiry") || 0);
-    const access = localStorage.getItem("google_access_token");
-    if (access && Date.now() < expiry) return access;
-    const refresh = localStorage.getItem("google_refresh_token");
-    if (!refresh) return null;
-    try {
-      const res = await fetch("https://oauth2.googleapis.com/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ client_id: GOOGLE_CLIENT_ID, grant_type: "refresh_token", refresh_token: refresh }),
-      });
-      const t = await res.json();
-      if (!t.access_token) return null;
-      localStorage.setItem("google_access_token", t.access_token);
-      localStorage.setItem("google_token_expiry", String(Date.now() + (t.expires_in - 60) * 1000));
-      setGoogleUser((prev) => prev ? { ...prev, accessToken: t.access_token } : null);
-      return t.access_token;
-    } catch { return null; }
+    return localStorage.getItem("google_access_token");
   };
 
   const fetchBusinessAccounts = async (token: string) => {
